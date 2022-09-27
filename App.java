@@ -80,11 +80,19 @@ public class App {
         // reg = "123";
         reg = "(01|23)*4";
         NFA_state nfa = Regex.parse( reg );
-        NFA_state.removeEpsilonEdges( nfa );
+        // NFA_state.removeEpsilonEdges( nfa );
+
 
         System.out.println();
         System.out.println( NFA_state.getStringRepresentation( nfa ) );
         System.out.println( NFA_state.c );
+
+        System.out.println( "\n".repeat(4));
+
+        DFA_state dfa = nfa.toDFA();
+
+        System.out.println( DFA_state.getStringRepresentation( dfa ) ); 
+
     }
 
     public static DFA_state DFA_sample() {
@@ -506,6 +514,110 @@ class NFA_state {
         return list;
     }
 
+
+    public DFA_state toDFA() {
+
+        List<DFA_state> dfa_states = new LinkedList<>();
+        Set<String> visitedDFA = new HashSet<>();
+        Set<NFA_state> visitedNFA = new HashSet<>();
+
+        DFA_state start = new DFA_state( name );
+        
+        DFA_state current_dfa = start;
+        // NFA_state current_nfa = this;
+
+        dfa_states.add( start );
+        
+
+        Map<Character, List<String>> newStatesNames = new HashMap<>();
+        Map<String, DFA_state> newStates = new HashMap<>();
+        Map<DFA_state, List<NFA_state>> dfa_nfa = new HashMap<>();
+        dfa_nfa.put( start, NFA_state.toList( this ) );
+        
+        while ( dfa_states.size() > 0 ) {
+            visitedNFA.clear();
+            // List<NFA_state> states = NFA_state.collectStates( this );
+            current_dfa = dfa_states.remove( 0 );
+
+            List<NFA_state> nfas = dfa_nfa.get( current_dfa );
+
+            System.out.println( "Current DFA: " + current_dfa.name );
+            nfas.forEach( (n) -> System.out.println( "Current NFA: " + n.name ) );
+
+            newStatesNames.clear();
+            for ( int i = 0; i < nfas.size(); ++i ) {
+                NFA_state current_nfa = nfas.get(i);
+                visitedNFA.add( current_nfa );
+
+                System.out.println( "Visiting NFA " + current_nfa.name );
+            // }
+                for ( NFA_edge e : current_nfa.out ) {
+                    // Check for epsilon edge. If it is, go to that state and try again.
+                    if ( e.isEpsilon && !visitedNFA.contains( e.to ) ) {
+                        nfas.add( e.to );
+                    } else {
+                        System.out.println( "Edge: " + e.from.name + " -" + e.accept + "> " + e.to.name );
+                        newStatesNames.merge( e.accept, NFA_state.toList( e.to.name ), (old, ne) -> { old.addAll( ne ); return old; } );
+                    }
+                }
+            }
+            
+            System.out.println( "\ncurrent_dfa: " + current_dfa.name );
+            System.out.println( "newStatesNames:" );
+            newStatesNames.forEach( (c, names) -> System.out.println( "\t(" + c + ", " + names + ")"));
+
+            // newStates.clear();
+            for ( char c : newStatesNames.keySet() ) {
+                if ( c == ' ' ) continue;
+                List<String> strings = newStatesNames.get( c );
+                // System.out.println( strings );
+                String s = "";
+                for ( String ss : strings ) s += ss + ",";
+                DFA_state state;
+                if ( newStates.containsKey( s ) )
+                    state = newStates.get( s );
+                else
+                    state = new DFA_state( s.substring(0, s.length() - 1) );
+                
+                System.out.println( "Creating state: " + state.name );
+                System.out.println( "Adding edge " + current_dfa.name + " -" + c + "> " + state.name );
+                newStates.put( s, state );
+
+                current_dfa.addEdge( c, state );
+                // newStates.put( s, state );
+                if ( !visitedDFA.contains( state.name ) ) {
+                    dfa_states.add( state );
+                    visitedDFA.add( state.name );
+                }
+                // Find the correct NFA_state that this DFA_state maps to. Might be a list of states.
+                for ( NFA_state current_nfa : nfas ) {
+                    for ( NFA_edge e : current_nfa.out ) {
+                        if ( state.name.contains( e.to.name ) ) // Some DFA states contains multiple of the same NFA state....
+                            dfa_nfa.merge( state, NFA_state.toList( e.to ), (old, ne) -> { 
+                                if ( !old.contains( ne.get( 0 ) ) ) // Bad solution..... Mayve use an extra HashSet for O(1) performance instead of O(n)...
+                                    old.addAll( ne ); 
+                                return old; 
+                            } );
+                    }
+                }
+                // nfa_dfa.put( current_nfa.out, state );
+
+            }
+            System.out.println( "-".repeat(10) );
+        }
+        
+
+        // Make the new states the correct isFinal
+        dfa_nfa.forEach( (dfa, nfas) -> {
+            nfas.forEach( (nfa) -> { if ( nfa.isFinal ) dfa.isFinal = true; } );
+        } );
+
+
+        return start;
+    }
+
+    /*
+     
     public DFA_state toDFA() {
 
         List<DFA_state> dfa_states = new LinkedList<>();
@@ -592,6 +704,9 @@ class NFA_state {
         return start;
     }
 
+
+     */
+
     private static<T> List<T> toList( T el ) {
         List<T> list = new ArrayList<T>();
         list.add( el );
@@ -630,13 +745,17 @@ class NFA_state {
 
             
 
-            List<NFA_edge> copyFrom = new ArrayList<>();
+            List<NFA_state> copyFrom = new ArrayList<>();
 
             for ( NFA_edge e : epsilonEdges ) {
                 NFA_state state = e.to;
+                for ( NFA_edge fromE : state.out ) {
+
+                }
+                copyFrom.add( state );
                 // Add the edges from this to copyFrom 
 
-                for ( )
+                
 
             }
 
@@ -645,6 +764,20 @@ class NFA_state {
 
     }
 
+    // private static List<NFA_state> collectStatesReachableWithEpsilon( NFA_state from ) {
+    //     List<NFA_state> states = new ArrayList<>();
+
+    //     for ( NFA_edge e : from.out ) {
+    //         if ( e.isEpsilon ) {
+
+    //         }
+    //     }
+
+
+
+    //     return states;
+
+    // }
 
     // private static void _removeEpsilonEdges( NFA_state nfa, List<NFA_state> q ) {
 
