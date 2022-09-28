@@ -1,5 +1,6 @@
 
 import src.*;
+
 // import java.util.List;
 // import java.util.Map;
 import java.util.Scanner;
@@ -78,12 +79,12 @@ public class App {
         // NFA_state.removeEpsilonEdges( start );
 
         // Utils.log( NFA_state.getStringRepresentation(start));
-
+        
         String reg = "(01|2)3";
         // reg = "01|3";
         // reg = "012asd";
         // reg = "12*3";
-        // reg = "(01|23)*4";
+        reg = "(01|23)*4";
         NFA_state nfa = Regex.parse( reg );
         // NFA_state.removeEpsilonEdges( nfa );
 
@@ -102,17 +103,17 @@ public class App {
 
     }
 
-    public static DFA_state DFA_sample() {
-        DFA_state start = new DFA_state( "Q" );
+    // public static DFA_state DFA_sample() {
+    //     DFA_state start = new DFA_state( "Q" );
 
-        DFA_state accept = new DFA_state( "F", true );
+    //     DFA_state accept = new DFA_state( "F", true );
         
-        start.addEdge( 'a', accept );        
+    //     start.addEdge( 'a', accept );        
 
-        start.registerWord( "Hej" );
-        start.registerWord( "Her" );
-        return start;
-    }
+    //     start.registerWord( "Hej" );
+    //     start.registerWord( "Her" );
+    //     return start;
+    // }
 
     public static void testRun( DFA_state start ) {
         
@@ -151,86 +152,6 @@ public class App {
 
         in.close();
     }
-
-    // public static DFA_state parseRegex( String reg ) {
-
-    //     // Read char by char
-    //     DFA_state start_state = new DFA_state( "q" );
-    //     DFA_state end = start_state;
-    //     for ( int i = 0; i < reg.length(); ++i ) {
-    //         char c = reg.charAt( i );
-    //         Utils.log( "\tChecking " + c );
-    //         if ( c == '(' ) {
-    //             int start = i+1;
-    //             int close = reg.indexOf( ')', start );
-    //             i = close + 1;
-    //             String subreg = reg.substring( start, close );
-    //             Utils.log( "\tSubreg: " + subreg );
-    //             if ( subreg.contains( "|" ) ) {
-    //                 List<DFA_state> union = parseRegex_union( end, subreg );
-
-    //                 // Check if there is a concatenation next. 
-    //                 // If so: make each of the union_states point to that next state.
-    //                 // Also check bounds...
-    //                 if ( i < reg.length() ) {
-    //                     char checkMe = reg.charAt( i );
-    //                     if ( checkMe != '(' || checkMe != '|' || checkMe != '*' ) {
-                            
-    //                         for ( DFA_state state : union ) {
-    //                             Utils.log( state.name );
-    //                             end = parseRegex_concat( state, checkMe + "" );
-    //                         }
-                            
-    //                     }
-    //                 }
-
-                    
-    //             }
-    //         } else {
-    //             int start = i;
-    //             int close = reg.indexOf( '(' ); // Also check * and |
-    //             Utils.log( "Close is: " + close );
-    //             close = close == 0 ? reg.length() : close;
-    //             Utils.log( "Close is: " + close );
-
-    //             String subreg = reg.substring( start, close );
-    //             end = parseRegex_concat( end, subreg );
-    //         }
-    //     }
-        
-
-    //     return start_state;
-    // } 
-
-    // public static List<DFA_state> parseRegex_union( DFA_state from, String reg ) {
-    //     Utils.log( reg );
-    //     List<DFA_state> states = new ArrayList<>();
-    //     // for ( int i = 0; i < reg.length(); ++i ) {
-    //         // char c = reg.charAt( i );
-
-    //         int edge = reg.indexOf( "|" );
-
-    //         DFA_state left = parseRegex_concat( from, reg.substring( 0, edge ) );
-    //         DFA_state right = parseRegex_concat( from, reg.substring( edge + 1 ) );
-    //         states.add( left );
-    //         states.add( right );
-    //     // }
-
-    //     return states;
-    // }
-
-    // public static DFA_state parseRegex_concat( DFA_state from, String reg ) {
-    //     Utils.log( reg );
-
-    //     return from.registerWord( reg ); // Return the last added state.
-
-    //     // return from.consumeWord( reg ); // Return the last added state.
-    // }
-
-    // public static DFA_state parseRegex_star( String reg ) {
-
-    //     return null;
-    // }
 }
 
 // class Regex {
