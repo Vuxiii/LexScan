@@ -1,5 +1,8 @@
 package src;
 
+/**
+ * This class represents edges between DFA_states
+ */
 public class DFA_edge {
     char accept;
     DFA_state to;

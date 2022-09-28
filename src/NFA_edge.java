@@ -1,5 +1,9 @@
 package src;
 
+/**
+ * This class represents edges between NFA_states
+ * It can either accept a char or it is a epsilon edge.
+ */
 public class NFA_edge {
     char accept;
     boolean isEpsilon = false;

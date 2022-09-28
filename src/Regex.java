@@ -3,6 +3,11 @@ package src;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This class parses regular expressions into an NFA.
+ * 
+ * Note: 1(2)*3 is how one would write 12*3 normally.
+ */
 public class Regex {
     /**
      * reg := concat + reg | concat
@@ -65,13 +70,9 @@ public class Regex {
             
             NFA_state right = parseConcat( list, head_state );
             NFA_state left = state;
-            // head_state.addEdge( left );
-            // head_state.addEdge( right );
-            
+
             state = new NFA_state( "UnionState" );
             Utils.log( "Made state with name: " + state.name );
-            // Utils.log( "\tAdding edge State: " + left.name + " -" + "epsilon2" + "> State: " + state.name );
-            // Utils.log( "\tAdding edge State: " + right.name + " -" + "epsilon3" + "> State: " + state.name );
             left.addEdge( state );
             right.addEdge( state );
 
@@ -86,11 +87,6 @@ public class Regex {
         Utils.log( "\t" + list );
         NFA_state state = parseToken( list, head_state );
 
-        // Add epsilon edge from head_state to state.
-
-        
-
-        // NFA_state start = new NFA_state();
 
         // Utils.log( "parseConcat after parseToken" );
         String s = "";
@@ -99,8 +95,6 @@ public class Regex {
         }
         Utils.log( "S is: " + s);
         if ( s.length() > 0 ) { 
-            // head_state.addEdge( state ); 
-            // head_state = state.registerWord( s ); 
             state = state.registerWord( s, false );
         }
         Utils.log( "Returning from parseConcat with: " + state.name );
@@ -120,17 +114,11 @@ public class Regex {
             list.remove(0);
 
             state = parseStar( list, head_state );
-            // head_state.addEdge( head, state );
             
             list.remove(0); // ')'
         } else {
             Utils.log( "\tNot paren" );
-            // state = new NFA_state();
             state = head_state;
-            // Utils.log( "\tMade state with name " + state.name );
-            // head_state.addEdge( head, state );
-
-            // list.remove(0);
         }
         Utils.log( "parseToken Done" );
         Utils.log( "Returning from parseToken with " + state.name );
