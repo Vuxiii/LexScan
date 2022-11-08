@@ -6,9 +6,13 @@ public class App {
     public static void main( String[] args ) {
         init( args );
 
-        DFA_state dfa = reg_sample();
+        Regex reg = new Regex( "123" );
 
-        testRun( dfa );
+        reg.match()
+
+        // DFA_state dfa = reg_sample();
+
+        // testRun( dfa );
 
     }
 

@@ -9,6 +9,25 @@ import java.util.List;
  * Note: 1(2)*3 is how one would write 12*3 normally.
  */
 public class Regex {
+    private final String reg;
+
+    private final DFA_state dfa;
+
+    public Regex( String reg ) {
+        this.reg = reg;
+
+        NFA_state nfa = parse( reg );
+
+        dfa = NFA_state.toDFA( nfa );
+
+    }
+
+    public List<String> match( String input ) {
+
+
+        return null;
+    }
+
     /**
      * reg := concat + reg | concat
      * concat := token * concat | token
@@ -20,7 +39,7 @@ public class Regex {
      * @param regex
      * @return
      */
-    public static NFA_state parse( String regex ) {
+    private static NFA_state parse( String regex ) {
 
         NFA_state start = new NFA_state();
         Utils.log( "Made state with name: " + start.name );
