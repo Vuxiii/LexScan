@@ -11,7 +11,7 @@ import java.util.List;
 public class Regex {
     private final String reg;
 
-    private final DFA_state dfa;
+    public final DFA_state dfa;
 
     public Regex( String reg ) {
         this.reg = reg;
